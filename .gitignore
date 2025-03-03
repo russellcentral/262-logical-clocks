@@ -1,0 +1,11 @@
+# .gitignore
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+*.dylib
+*.dll
+
+# Logs directory
+logs/
