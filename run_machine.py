@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 run_machine.py
 
@@ -12,7 +11,6 @@ Usage:
 import multiprocessing
 import time
 import subprocess
-import os
 
 def launch_machine(machine_id, port, peers, log, duration=60):
     """

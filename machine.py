@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 machine.py
 
@@ -44,7 +43,7 @@ class Machine:
         """
         self.machine_id = machine_id
         self.listen_port = listen_port
-        self.peer_addresses = peer_addresses  # e.g. [("192.168.1.10", 5002), ("192.168.1.20", 5003)]
+        self.peer_addresses = peer_addresses  # such as [("192.168.1.10", 5002), ("192.168.1.20", 5003)]
         self.log_filename = log_filename
         self.run_seconds = run_seconds
 
