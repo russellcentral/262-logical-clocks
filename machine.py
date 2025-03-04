@@ -24,6 +24,7 @@ Explanation:
     --duration  : How long (in seconds) this machine will run before stopping.
 """
 
+import json
 import socket
 import threading
 import time
@@ -165,10 +166,14 @@ class Machine:
 
         queue_len = self.incoming_queue.qsize()
         sys_time = time.time()
-        self.log_file.write(
-            f"RECEIVE, system_time={sys_time}, old_clock={old_clock}, "
-            f"new_clock={self.local_clock}, queue_len={queue_len}\n"
-        )
+        event_data = {
+            "event": "RECEIVE",
+            "system_time": sys_time,
+            "old_clock": old_clock,
+            "new_clock": self.local_clock,
+            "queue_len": queue_len
+        }
+        self.log_file.write(json.dumps(event_data) + "\n")
 
     def handle_no_message(self):
         """
@@ -207,10 +212,14 @@ class Machine:
                 # If the peer is unreachable, we ignore or log the error
                 pass
 
-        self.log_file.write(
-            f"SEND, system_time={sys_time}, old_clock={old_clock}, "
-            f"new_clock={self.local_clock}, recipients={recipients}\n"
-        )
+        event_data = {
+            "event": "SEND",
+            "system_time": sys_time,
+            "old_clock": old_clock,
+            "new_clock": self.local_clock,
+            "recipients": recipients
+        }
+        self.log_file.write(json.dumps(event_data) + "\n")
 
     def internal_event(self):
         """
@@ -219,10 +228,14 @@ class Machine:
         old_clock = self.local_clock
         self.local_clock += 1
         sys_time = time.time()
-        self.log_file.write(
-            f"INTERNAL, system_time={sys_time}, old_clock={old_clock}, "
-            f"new_clock={self.local_clock}\n"
-        )
+
+        event_data = {
+            "event": "INTERNAL",
+            "system_time": sys_time,
+            "old_clock": old_clock,
+            "new_clock": self.local_clock
+        }
+        self.log_file.write(json.dumps(event_data) + "\n")
 
     def shutdown(self):
         """
