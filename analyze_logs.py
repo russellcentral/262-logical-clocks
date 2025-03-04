@@ -117,11 +117,6 @@ def main():
     else:
         drift = 0
 
-    # Print summary table
-    print("\n=== Run Summary ===")
-    print(summary_df)
-    print(f"Final Drift (max - min final clock) = {drift}\n")
-
     # 2) Plotting
     # We'll produce a single figure with 2 or 3 subplots:
     #   Subplot A: new_clock vs. system_time
@@ -170,10 +165,28 @@ def main():
     # Save figure to same folder as logs
     fig_path = os.path.join(out_dir, "analysis_subplots.png")
     plt.savefig(fig_path)
-    plt.show()
+    plt.close(fig)
 
-    print(f"Plots saved to: {fig_path}")
-    print("Analysis complete.\n")
+    md_path = os.path.join(out_dir, "analysis_summary.md")
+    with open(md_path, "w") as md_file:
+        md_file.write("# Analysis Summary\n\n")
+
+        md_file.write("## Summary Table\n\n")
+        md_file.write(summary_df.to_markdown(index=False))
+        md_file.write("\n\n")
+
+        md_file.write(f"**Final Drift (max - min final_clock)**: {drift}\n\n")
+
+        md_file.write("## Observations\n")
+        md_file.write("- Here you can add your own notes or automated observations.\n")
+        md_file.write("- For instance, check if the drift is large or small.\n")
+        md_file.write("- Compare average jump sizes across machines.\n")
+        md_file.write("- Check if max queue length indicates any backlog.\n\n")
+
+        md_file.write(f"## Plot\n\n")
+        md_file.write(f"![analysis_subplots](analysis_subplots.png)\n")
+
+    print(f"Analysis complete. See '{md_path}' for details and '{fig_path}' for plots.")
 
 if __name__ == "__main__":
     main()
