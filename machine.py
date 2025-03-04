@@ -70,6 +70,14 @@ class Machine:
         # Control flag for shutting down gracefully
         self.running = True
 
+        startup_event = {
+            "event": "STARTUP",
+            "system_time": time.time(),
+            "machine_id": self.machine_id,
+            "clock_rate": self.clock_rate
+        }
+        self.log_file.write(json.dumps(startup_event) + "\n")
+
     def start(self):
         """
         Starts the machine:
@@ -88,25 +96,18 @@ class Machine:
         self.shutdown()
 
     def listen_for_connections(self):
-        """
-        Continuously accept incoming connections and spawn a handler thread for each one.
-        This runs in a background thread until `self.running` is set to False.
-        """
         while self.running:
             try:
                 conn, addr = self.server_socket.accept()
-                handler_thread = threading.Thread(
+                threading.Thread(
                     target=self.handle_incoming_connection,
                     args=(conn,),
                     daemon=True
-                )
-                handler_thread.start()
+                ).start()
             except socket.timeout:
-                # We set a timeout to allow checking self.running regularly
                 continue
             except Exception as e:
-                # Unexpected errors: log or ignore as appropriate
-                print(f"[Machine {self.machine_id}] Error accepting connection: {e}", file=sys.stderr)
+                print(f"[Machine {self.machine_id}] Socket error: {e}", file=sys.stderr)
                 break
 
     def handle_incoming_connection(self, conn):
@@ -169,6 +170,7 @@ class Machine:
         event_data = {
             "event": "RECEIVE",
             "system_time": sys_time,
+            "machine_id": self.machine_id,
             "old_clock": old_clock,
             "new_clock": self.local_clock,
             "queue_len": queue_len
@@ -215,6 +217,7 @@ class Machine:
         event_data = {
             "event": "SEND",
             "system_time": sys_time,
+            "machine_id": self.machine_id,
             "old_clock": old_clock,
             "new_clock": self.local_clock,
             "recipients": recipients
@@ -232,6 +235,7 @@ class Machine:
         event_data = {
             "event": "INTERNAL",
             "system_time": sys_time,
+            "machine_id": self.machine_id,
             "old_clock": old_clock,
             "new_clock": self.local_clock
         }
@@ -241,6 +245,14 @@ class Machine:
         """
         Closes the server socket and the log file.
         """
+        end_event = {
+            "event": "END",
+            "system_time": time.time(),
+            "machine_id": self.machine_id,
+            "final_clock": self.local_clock
+        }
+        self.log_file.write(json.dumps(end_event) + "\n")
+        
         self.running = False
         try:
             self.server_socket.close()

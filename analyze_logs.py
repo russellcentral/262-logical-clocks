@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def parse_json_log_file(filename, machine_id=None):
+def parse_json_log_file(filename):
     """
-    Reads each line of filename as JSON, returns a DataFrame.
+    Returns a DataFrame of all events in the given JSON log file.
+    Each row has keys like: event, system_time, machine_id, old_clock, new_clock, queue_len, etc.
     """
     rows = []
     with open(filename, 'r') as f:
@@ -17,7 +18,7 @@ def parse_json_log_file(filename, machine_id=None):
             if not line:
                 continue
             record = json.loads(line)
-            record['machine_id'] = machine_id
+            record['log_file'] = filename
             rows.append(record)
     return pd.DataFrame(rows)
 
@@ -38,63 +39,141 @@ def main():
     
     all_dfs = []
     for logf in log_files:
-        guessed_id = None
-        base = os.path.basename(logf)
-        match = re.search(r'machine_(\d+)', base)
-        guessed_id = int(match.group(1)) if match else None
-        
-        df = parse_json_log_file(logf, machine_id=guessed_id)
-        df['log_file'] = logf  # keep track of which file
+        df = parse_json_log_file(logf)
         all_dfs.append(df)
     
     data = pd.concat(all_dfs, ignore_index=True)
     data = data.sort_values(by='system_time')
+
+    for col in ['old_clock', 'new_clock', 'queue_len', 'final_clock', 'clock_rate']:
+        if col in data.columns:
+            data[col] = pd.to_numeric(data[col], errors='coerce')
     
-    # Plot new_clock vs system_time for each machine
-    plt.figure(figsize=(10, 6))
-    for machine_id, grp in data.groupby('machine_id'):
-        plt.plot(grp['system_time'], grp['new_clock'], label=f"Machine {machine_id}")
-    plt.xlabel("System Time (s)")
-    plt.ylabel("Lamport Clock (new_clock)")
-    plt.title("Lamport Clock vs. System Time")
-    plt.legend()
-    plt.tight_layout()
-    plot_path = os.path.join(out_dir, "lamport_clock_vs_time.png")
-    plt.savefig(plot_path)
-    plt.show()
-    
-    # Plot queue_len vs. system_time for RECEIVE events only
+    # 1) Summaries: clock_rate, final drift, average jump, max queue length
+    # ---------------------------------------------------------------------
+
+    # Gather STARTUP events for each machine
+    startup_df = data[data['event'] == 'STARTUP'].copy()
+
+    # Gather END events for each machine (final_clock)
+    end_df = data[data['event'] == 'END'].copy()
+
+    # For each machine, we can find the final_clock from the END event
+    # We'll build a summary table
+    summary_rows = []
+
+    # Identify unique machines
+    machines = data['machine_id'].dropna().unique()
+    machines = sorted(machines)
+
+    # We'll store final clocks to compute drift
+    final_clocks = []
+
+    for m_id in machines:
+        # clock rate
+        rate = None
+        # final clock
+        fclock = None
+
+        # startup row
+        srow = startup_df[startup_df['machine_id'] == m_id]
+        if not srow.empty and 'clock_rate' in srow.columns:
+            rate = srow['clock_rate'].iloc[0]
+
+        # end row
+        erow = end_df[end_df['machine_id'] == m_id]
+        if not erow.empty and 'final_clock' in erow.columns:
+            fclock = erow['final_clock'].iloc[0]
+            final_clocks.append(fclock)
+
+        # average jump size
+        # we define jump as (new_clock - old_clock) for SEND, RECEIVE, INTERNAL
+        # ignoring rows that lack old_clock/new_clock
+        events_m = data[(data['machine_id'] == m_id) & 
+                        (data['old_clock'].notna()) & 
+                        (data['new_clock'].notna())]
+        jumps = events_m['new_clock'] - events_m['old_clock']
+        avg_jump = jumps.mean() if not jumps.empty else np.nan
+
+        # max queue length
+        # only valid for RECEIVE events
+        rec_m = data[(data['machine_id'] == m_id) & (data['event'] == 'RECEIVE')]
+        max_q = rec_m['queue_len'].max() if not rec_m.empty else 0
+
+        summary_rows.append({
+            "machine_id": m_id,
+            "clock_rate": rate,
+            "final_clock": fclock,
+            "avg_jump_size": avg_jump,
+            "max_queue_len": max_q
+        })
+
+    summary_df = pd.DataFrame(summary_rows)
+
+    # compute final drift = max final clock - min final clock
+    drift = None
+    if len(final_clocks) > 1:
+        drift = max(final_clocks) - min(final_clocks)
+    else:
+        drift = 0
+
+    # Print summary table
+    print("\n=== Run Summary ===")
+    print(summary_df)
+    print(f"Final Drift (max - min final clock) = {drift}\n")
+
+    # 2) Plotting
+    # We'll produce a single figure with 2 or 3 subplots:
+    #   Subplot A: new_clock vs. system_time
+    #   Subplot B: queue_len vs. system_time (for RECEIVE)
+    #   Subplot C (optional): clock_jump vs. system_time
+
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharex=False)
+
+    # Subplot A: new_clock vs. system_time
+    ax1 = axes[0]
+    for m_id, grp in data.groupby('machine_id'):
+        # skip if no new_clock
+        if 'new_clock' not in grp.columns:
+            continue
+        ax1.plot(grp['system_time'], grp['new_clock'], label=f"M{int(m_id)}")
+    ax1.set_title("Lamport Clock vs. Time")
+    ax1.set_xlabel("System Time (s)")
+    ax1.set_ylabel("Lamport Clock")
+    ax1.legend()
+
+    # Subplot B: queue_len vs. system_time (RECEIVE only)
+    ax2 = axes[1]
     receives = data[data['event'] == 'RECEIVE'].copy()
-    plt.figure(figsize=(10, 6))
-    for machine_id, grp in receives.groupby('machine_id'):
-        plt.plot(grp['system_time'], grp['queue_len'], marker='o', linestyle='-', label=f"Machine {machine_id}")
-    plt.xlabel("System Time (s)")
-    plt.ylabel("Queue Length")
-    plt.title("Message Queue Length on RECEIVE Events")
-    plt.legend()
-    plt.tight_layout()
-    plot_path = os.path.join(out_dir, "queue_length_vs_time.png")
-    plt.savefig(plot_path)
-    plt.show()
-    
-    # Plot clock_jump vs system_time for each machine
-    # A jump is (new_clock - old_clock)
+    for m_id, grp in receives.groupby('machine_id'):
+        ax2.plot(grp['system_time'], grp['queue_len'], marker='o', linestyle='-', label=f"M{int(m_id)}")
+    ax2.set_title("Queue Length (RECEIVE)")
+    ax2.set_xlabel("System Time (s)")
+    ax2.set_ylabel("Queue Len")
+    ax2.legend()
+
+    # Subplot C: (Optional) clock_jump vs. system_time
+    # We'll do average jump or a line if we want. Let's do the line for illustration,
+    # but you could skip it or just plot a single average point.
+    ax3 = axes[2]
     data['clock_jump'] = data['new_clock'] - data['old_clock']
-    plt.figure(figsize=(10, 6))
-    for machine_id, grp in data.groupby('machine_id'):
-        # Filter out NaN clock_jump values
-        jumps = grp[~grp['clock_jump'].isna()]
-        plt.plot(jumps['system_time'], jumps['clock_jump'], label=f"Machine {machine_id}")
-    plt.xlabel("System Time (s)")
-    plt.ylabel("Clock Jump (new_clock - old_clock)")
-    plt.title("Size of Clock Jumps Over Time")
-    plt.legend()
+    # We only consider rows with old_clock/new_clock
+    for m_id, grp in data.groupby('machine_id'):
+        valid = grp[grp['clock_jump'].notna()]
+        ax3.plot(valid['system_time'], valid['clock_jump'], label=f"M{int(m_id)}")
+    ax3.set_title("Clock Jump vs. Time")
+    ax3.set_xlabel("System Time (s)")
+    ax3.set_ylabel("Jump (new_clock - old_clock)")
+    ax3.legend()
+
     plt.tight_layout()
-    plot_path = os.path.join(out_dir, "clock_jumps_vs_time.png")
-    plt.savefig(plot_path)
+    # Save figure to same folder as logs
+    fig_path = os.path.join(out_dir, "analysis_subplots.png")
+    plt.savefig(fig_path)
     plt.show()
-    
-    print(f"Analysis complete. Plots saved in '{out_dir}'.")
+
+    print(f"Plots saved to: {fig_path}")
+    print("Analysis complete.\n")
 
 if __name__ == "__main__":
     main()
