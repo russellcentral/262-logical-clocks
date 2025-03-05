@@ -1,0 +1,121 @@
+{"event": "STARTUP", "system_time": 1741130946.4773471, "machine_id": 2, "clock_rate": 2}
+{"event": "INTERNAL", "system_time": 1741130946.9825869, "machine_id": 2, "old_clock": 0, "new_clock": 1}
+{"event": "INTERNAL", "system_time": 1741130947.485033, "machine_id": 2, "old_clock": 1, "new_clock": 2}
+{"event": "INTERNAL", "system_time": 1741130947.985505, "machine_id": 2, "old_clock": 2, "new_clock": 3}
+{"event": "RECEIVE", "system_time": 1741130948.490994, "machine_id": 2, "old_clock": 3, "new_clock": 6, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130948.9964669, "machine_id": 2, "old_clock": 6, "new_clock": 7, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130949.501943, "machine_id": 2, "old_clock": 7, "new_clock": 16, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130950.007305, "machine_id": 2, "old_clock": 16, "new_clock": 19, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130950.5129158, "machine_id": 2, "old_clock": 19, "new_clock": 20}
+{"event": "RECEIVE", "system_time": 1741130951.018206, "machine_id": 2, "old_clock": 20, "new_clock": 26, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130951.521367, "machine_id": 2, "old_clock": 26, "new_clock": 29, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130952.0265841, "machine_id": 2, "old_clock": 29, "new_clock": 31, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130952.528929, "machine_id": 2, "old_clock": 31, "new_clock": 36, "queue_len": 0}
+{"event": "SEND", "system_time": 1741130953.033943, "machine_id": 2, "old_clock": 36, "new_clock": 37, "recipients": [["localhost", 5001]]}
+{"event": "INTERNAL", "system_time": 1741130953.541991, "machine_id": 2, "old_clock": 37, "new_clock": 38}
+{"event": "INTERNAL", "system_time": 1741130954.04723, "machine_id": 2, "old_clock": 38, "new_clock": 39}
+{"event": "INTERNAL", "system_time": 1741130954.5503979, "machine_id": 2, "old_clock": 39, "new_clock": 40}
+{"event": "RECEIVE", "system_time": 1741130955.053824, "machine_id": 2, "old_clock": 40, "new_clock": 50, "queue_len": 0}
+{"event": "SEND", "system_time": 1741130955.559106, "machine_id": 2, "old_clock": 50, "new_clock": 51, "recipients": [["localhost", 5001], ["localhost", 5003]]}
+{"event": "INTERNAL", "system_time": 1741130956.06709, "machine_id": 2, "old_clock": 51, "new_clock": 52}
+{"event": "RECEIVE", "system_time": 1741130956.5722299, "machine_id": 2, "old_clock": 52, "new_clock": 58, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130957.074504, "machine_id": 2, "old_clock": 58, "new_clock": 62, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130957.5800161, "machine_id": 2, "old_clock": 62, "new_clock": 63}
+{"event": "RECEIVE", "system_time": 1741130958.083806, "machine_id": 2, "old_clock": 63, "new_clock": 65, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130958.58923, "machine_id": 2, "old_clock": 65, "new_clock": 66, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130959.094673, "machine_id": 2, "old_clock": 66, "new_clock": 67, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130959.599991, "machine_id": 2, "old_clock": 67, "new_clock": 73, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130960.1039202, "machine_id": 2, "old_clock": 73, "new_clock": 76, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130960.609343, "machine_id": 2, "old_clock": 76, "new_clock": 81, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130961.114608, "machine_id": 2, "old_clock": 81, "new_clock": 82, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130961.619885, "machine_id": 2, "old_clock": 82, "new_clock": 83, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130962.125323, "machine_id": 2, "old_clock": 83, "new_clock": 91, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130962.626165, "machine_id": 2, "old_clock": 91, "new_clock": 93, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130963.127695, "machine_id": 2, "old_clock": 93, "new_clock": 97, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130963.632821, "machine_id": 2, "old_clock": 97, "new_clock": 98}
+{"event": "RECEIVE", "system_time": 1741130964.138231, "machine_id": 2, "old_clock": 98, "new_clock": 104, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130964.6431391, "machine_id": 2, "old_clock": 104, "new_clock": 105}
+{"event": "INTERNAL", "system_time": 1741130965.147531, "machine_id": 2, "old_clock": 105, "new_clock": 106}
+{"event": "RECEIVE", "system_time": 1741130965.6531022, "machine_id": 2, "old_clock": 106, "new_clock": 110, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130966.1567612, "machine_id": 2, "old_clock": 110, "new_clock": 111, "queue_len": 4}
+{"event": "RECEIVE", "system_time": 1741130966.6621509, "machine_id": 2, "old_clock": 111, "new_clock": 112, "queue_len": 5}
+{"event": "RECEIVE", "system_time": 1741130967.167656, "machine_id": 2, "old_clock": 112, "new_clock": 113, "queue_len": 4}
+{"event": "RECEIVE", "system_time": 1741130967.674655, "machine_id": 2, "old_clock": 113, "new_clock": 114, "queue_len": 4}
+{"event": "RECEIVE", "system_time": 1741130968.1806788, "machine_id": 2, "old_clock": 114, "new_clock": 115, "queue_len": 3}
+{"event": "RECEIVE", "system_time": 1741130968.685215, "machine_id": 2, "old_clock": 115, "new_clock": 117, "queue_len": 4}
+{"event": "RECEIVE", "system_time": 1741130969.190561, "machine_id": 2, "old_clock": 117, "new_clock": 118, "queue_len": 4}
+{"event": "RECEIVE", "system_time": 1741130969.6958048, "machine_id": 2, "old_clock": 118, "new_clock": 123, "queue_len": 4}
+{"event": "RECEIVE", "system_time": 1741130970.196379, "machine_id": 2, "old_clock": 123, "new_clock": 129, "queue_len": 4}
+{"event": "RECEIVE", "system_time": 1741130970.701717, "machine_id": 2, "old_clock": 129, "new_clock": 130, "queue_len": 3}
+{"event": "RECEIVE", "system_time": 1741130971.2073228, "machine_id": 2, "old_clock": 130, "new_clock": 131, "queue_len": 3}
+{"event": "RECEIVE", "system_time": 1741130971.712768, "machine_id": 2, "old_clock": 131, "new_clock": 136, "queue_len": 3}
+{"event": "RECEIVE", "system_time": 1741130972.2181609, "machine_id": 2, "old_clock": 136, "new_clock": 137, "queue_len": 3}
+{"event": "RECEIVE", "system_time": 1741130972.7222211, "machine_id": 2, "old_clock": 137, "new_clock": 143, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130973.2227619, "machine_id": 2, "old_clock": 143, "new_clock": 147, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130973.7269278, "machine_id": 2, "old_clock": 147, "new_clock": 150, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130974.232946, "machine_id": 2, "old_clock": 150, "new_clock": 156, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130974.738681, "machine_id": 2, "old_clock": 156, "new_clock": 158, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130975.239677, "machine_id": 2, "old_clock": 158, "new_clock": 160, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130975.7405598, "machine_id": 2, "old_clock": 160, "new_clock": 167, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130976.242223, "machine_id": 2, "old_clock": 167, "new_clock": 173, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130976.747593, "machine_id": 2, "old_clock": 173, "new_clock": 176, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130977.253031, "machine_id": 2, "old_clock": 176, "new_clock": 178, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130977.758454, "machine_id": 2, "old_clock": 178, "new_clock": 179, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130978.2617779, "machine_id": 2, "old_clock": 179, "new_clock": 180}
+{"event": "RECEIVE", "system_time": 1741130978.767064, "machine_id": 2, "old_clock": 180, "new_clock": 188, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130979.272438, "machine_id": 2, "old_clock": 188, "new_clock": 190, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130979.7778618, "machine_id": 2, "old_clock": 190, "new_clock": 191, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130980.281877, "machine_id": 2, "old_clock": 191, "new_clock": 192, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130980.7859478, "machine_id": 2, "old_clock": 192, "new_clock": 193}
+{"event": "INTERNAL", "system_time": 1741130981.288544, "machine_id": 2, "old_clock": 193, "new_clock": 194}
+{"event": "SEND", "system_time": 1741130981.79392, "machine_id": 2, "old_clock": 194, "new_clock": 195, "recipients": [["localhost", 5001]]}
+{"event": "RECEIVE", "system_time": 1741130982.3010209, "machine_id": 2, "old_clock": 195, "new_clock": 207, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130982.8054001, "machine_id": 2, "old_clock": 207, "new_clock": 208}
+{"event": "RECEIVE", "system_time": 1741130983.310287, "machine_id": 2, "old_clock": 208, "new_clock": 215, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130983.814848, "machine_id": 2, "old_clock": 215, "new_clock": 216}
+{"event": "RECEIVE", "system_time": 1741130984.317781, "machine_id": 2, "old_clock": 216, "new_clock": 221, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130984.818604, "machine_id": 2, "old_clock": 221, "new_clock": 222, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130985.320374, "machine_id": 2, "old_clock": 222, "new_clock": 225, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130985.820838, "machine_id": 2, "old_clock": 225, "new_clock": 228, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130986.3251882, "machine_id": 2, "old_clock": 228, "new_clock": 229}
+{"event": "RECEIVE", "system_time": 1741130986.830506, "machine_id": 2, "old_clock": 229, "new_clock": 231, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130987.3357399, "machine_id": 2, "old_clock": 231, "new_clock": 236, "queue_len": 3}
+{"event": "RECEIVE", "system_time": 1741130987.8411689, "machine_id": 2, "old_clock": 236, "new_clock": 237, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130988.342941, "machine_id": 2, "old_clock": 237, "new_clock": 238, "queue_len": 3}
+{"event": "RECEIVE", "system_time": 1741130988.848149, "machine_id": 2, "old_clock": 238, "new_clock": 239, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130989.350014, "machine_id": 2, "old_clock": 239, "new_clock": 241, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130989.8553941, "machine_id": 2, "old_clock": 241, "new_clock": 244, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130990.3607821, "machine_id": 2, "old_clock": 244, "new_clock": 250, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130990.8628328, "machine_id": 2, "old_clock": 250, "new_clock": 258, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130991.36812, "machine_id": 2, "old_clock": 258, "new_clock": 259}
+{"event": "INTERNAL", "system_time": 1741130991.8730319, "machine_id": 2, "old_clock": 259, "new_clock": 260}
+{"event": "INTERNAL", "system_time": 1741130992.378453, "machine_id": 2, "old_clock": 260, "new_clock": 261}
+{"event": "RECEIVE", "system_time": 1741130992.883855, "machine_id": 2, "old_clock": 261, "new_clock": 269, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130993.3879418, "machine_id": 2, "old_clock": 269, "new_clock": 270, "queue_len": 2}
+{"event": "RECEIVE", "system_time": 1741130993.893182, "machine_id": 2, "old_clock": 270, "new_clock": 273, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130994.398504, "machine_id": 2, "old_clock": 273, "new_clock": 274, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130994.9039512, "machine_id": 2, "old_clock": 274, "new_clock": 278, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130995.4093802, "machine_id": 2, "old_clock": 278, "new_clock": 279}
+{"event": "RECEIVE", "system_time": 1741130995.9147892, "machine_id": 2, "old_clock": 279, "new_clock": 287, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130996.4155588, "machine_id": 2, "old_clock": 287, "new_clock": 291, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130996.920937, "machine_id": 2, "old_clock": 291, "new_clock": 294, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130997.423624, "machine_id": 2, "old_clock": 294, "new_clock": 295, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130997.927404, "machine_id": 2, "old_clock": 295, "new_clock": 298, "queue_len": 1}
+{"event": "RECEIVE", "system_time": 1741130998.4327428, "machine_id": 2, "old_clock": 298, "new_clock": 301, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130998.937907, "machine_id": 2, "old_clock": 301, "new_clock": 305, "queue_len": 0}
+{"event": "RECEIVE", "system_time": 1741130999.4430962, "machine_id": 2, "old_clock": 305, "new_clock": 309, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741130999.947455, "machine_id": 2, "old_clock": 309, "new_clock": 310}
+{"event": "INTERNAL", "system_time": 1741131000.452868, "machine_id": 2, "old_clock": 310, "new_clock": 311}
+{"event": "INTERNAL", "system_time": 1741131000.958289, "machine_id": 2, "old_clock": 311, "new_clock": 312}
+{"event": "RECEIVE", "system_time": 1741131001.46375, "machine_id": 2, "old_clock": 312, "new_clock": 320, "queue_len": 0}
+{"event": "SEND", "system_time": 1741131001.969159, "machine_id": 2, "old_clock": 320, "new_clock": 321, "recipients": [["localhost", 5001], ["localhost", 5003]]}
+{"event": "INTERNAL", "system_time": 1741131002.477418, "machine_id": 2, "old_clock": 321, "new_clock": 322}
+{"event": "SEND", "system_time": 1741131002.97877, "machine_id": 2, "old_clock": 322, "new_clock": 323, "recipients": [["localhost", 5003]]}
+{"event": "INTERNAL", "system_time": 1741131003.483419, "machine_id": 2, "old_clock": 323, "new_clock": 324}
+{"event": "INTERNAL", "system_time": 1741131003.9886441, "machine_id": 2, "old_clock": 324, "new_clock": 325}
+{"event": "INTERNAL", "system_time": 1741131004.4940128, "machine_id": 2, "old_clock": 325, "new_clock": 326}
+{"event": "RECEIVE", "system_time": 1741131004.996165, "machine_id": 2, "old_clock": 326, "new_clock": 340, "queue_len": 0}
+{"event": "INTERNAL", "system_time": 1741131005.5015419, "machine_id": 2, "old_clock": 340, "new_clock": 341}
+{"event": "INTERNAL", "system_time": 1741131006.004104, "machine_id": 2, "old_clock": 341, "new_clock": 342}
+{"event": "RECEIVE", "system_time": 1741131006.506091, "machine_id": 2, "old_clock": 342, "new_clock": 349, "queue_len": 1}
+{"event": "END", "system_time": 1741131006.5063229, "machine_id": 2, "final_clock": 349}

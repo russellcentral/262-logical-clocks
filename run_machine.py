@@ -10,6 +10,7 @@ Usage:
     python run_machine.py
 """
 
+import argparse
 import multiprocessing
 import time
 import subprocess
@@ -33,12 +34,17 @@ def launch_machine(machine_id, port, peers, log_path, duration=60):
     subprocess.run(cmd)
 
 if __name__ == "__main__":
-    # Generate a timestamp-based run ID
-    # e.g. "2025-03-03_15-30-01"
-    run_id = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    
-    # Create a subdirectory in logs/ for this run
-    logs_subdir = os.path.join("logs", f"run_{run_id}")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--logs_dir", type=str, default="", help="Override logs directory")
+    parser.add_argument("--duration", type=int, default=60, help="Run duration")
+    args = parser.parse_args()
+
+    if args.logs_dir:
+        logs_subdir = args.logs_dir
+    else:
+        run_id = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        logs_subdir = os.path.join("logs", f"run_{run_id}")
+
     os.makedirs(logs_subdir, exist_ok=True)
     
     # Example config for three machines
@@ -60,18 +66,15 @@ if __name__ == "__main__":
     # Create processes for each machine
     processes = []
     for cfg in machine_configs:
-        # Construct a unique log filename
-        # e.g. logs/run_2025-03-03_15-30-01/machine_1.log
         log_file = os.path.join(logs_subdir, f"machine_{cfg['id']}.log")
-        
         p = multiprocessing.Process(
             target=launch_machine,
             args=(
                 cfg["id"],
                 cfg["port"],
                 cfg["peers"],
-                log_file,   # pass the log path
-                60          # run duration
+                log_file,
+                args.duration
             )
         )
         p.start()
