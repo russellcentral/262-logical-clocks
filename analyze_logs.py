@@ -49,8 +49,7 @@ def main():
         if col in data.columns:
             data[col] = pd.to_numeric(data[col], errors='coerce')
     
-    # 1) Summaries: clock_rate, final drift, average jump, max queue length
-    # ---------------------------------------------------------------------
+    ### Summaries: clock_rate, final drift, average jump, max queue length ##
 
     # Gather STARTUP events for each machine
     startup_df = data[data['event'] == 'STARTUP'].copy()
@@ -59,14 +58,13 @@ def main():
     end_df = data[data['event'] == 'END'].copy()
 
     # For each machine, we can find the final_clock from the END event
-    # We'll build a summary table
     summary_rows = []
 
     # Identify unique machines
     machines = data['machine_id'].dropna().unique()
     machines = sorted(machines)
 
-    # We'll store final clocks to compute drift
+    # Store final clocks to compute drift
     final_clocks = []
 
     for m_id in machines:
@@ -117,15 +115,13 @@ def main():
     else:
         drift = 0
 
-    # 2) Plotting
-    # We'll produce a single figure with 2 or 3 subplots:
+    # We produce a single figure with 2 or 3 subplots:
     #   Subplot A: new_clock vs. system_time
     #   Subplot B: queue_len vs. system_time (for RECEIVE)
-    #   Subplot C (optional): clock_jump vs. system_time
+    #   Subplot C: clock_jump vs. system_time
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharex=False)
 
-    # Subplot A: new_clock vs. system_time
     ax1 = axes[0]
     for m_id, grp in data.groupby('machine_id'):
         # skip if no new_clock
@@ -137,7 +133,6 @@ def main():
     ax1.set_ylabel("Lamport Clock")
     ax1.legend()
 
-    # Subplot B: queue_len vs. system_time (RECEIVE only)
     ax2 = axes[1]
     receives = data[data['event'] == 'RECEIVE'].copy()
     for m_id, grp in receives.groupby('machine_id'):
@@ -147,9 +142,6 @@ def main():
     ax2.set_ylabel("Queue Len")
     ax2.legend()
 
-    # Subplot C: (Optional) clock_jump vs. system_time
-    # We'll do average jump or a line if we want. Let's do the line for illustration,
-    # but you could skip it or just plot a single average point.
     ax3 = axes[2]
     data['clock_jump'] = data['new_clock'] - data['old_clock']
     # We only consider rows with old_clock/new_clock
@@ -162,7 +154,6 @@ def main():
     ax3.legend()
 
     plt.tight_layout()
-    # Save figure to same folder as logs
     fig_path = os.path.join(out_dir, "analysis_subplots.png")
     plt.savefig(fig_path)
     plt.close(fig)
