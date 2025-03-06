@@ -1,5 +1,5 @@
 ```markdown
-
+---
 # 262-Logical-Clocks
 
 This repository implements a **small distributed system** in Python using **Lamport logical clocks**. It features:
