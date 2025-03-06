@@ -1,5 +1,4 @@
 ```markdown
----
 # 262-Logical-Clocks
 
 This repository implements a **small distributed system** in Python using **Lamport logical clocks**. It features:
@@ -12,8 +11,6 @@ This repository implements a **small distributed system** in Python using **Lamp
 - A **helper script** (`run_machine.py`) to launch multiple local machines.
 - An **analysis script** (`analyze_logs.py`) that merges logs, computes clock drift, queue lengths, etc., and generates plots.
 - A **Pytest test suite** covering both unit and integration tests.
-
----
 
 ---
 
