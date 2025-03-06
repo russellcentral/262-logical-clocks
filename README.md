@@ -1,4 +1,3 @@
-```markdown
 # 262-Logical-Clocks
 
 This repository implements a **small distributed system** in Python using **Lamport logical clocks**. It features:
@@ -203,6 +202,5 @@ python -m pytest
 - **Tests** ensure that each component (machine logic, multi-machine integration, log analysis) is correct and robust.
 
 This architecture **cleanly demonstrates** Lamport clock synchronization with real network communication and comprehensive logging/analysis. You can expand it with additional machines, custom event distributions, or more sophisticated analysis as needed.
-```
 
 ---
