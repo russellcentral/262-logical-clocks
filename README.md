@@ -5,8 +5,8 @@ This repository implements a **small distributed system** in Python using **Lamp
 - Multiple “virtual machines,” each with:
   - **Random clock rates** (1–6 ticks per real second),
   - **Lamport clock** logic for send/receive/internal events,
-  - **TCP socket** communication,
-  - **JSON-based logging** of all events.
+  - **TCP socket** communication (each node is both a server and a client),
+  - **JSON-based logging** of all events in a line-buffered file.
 - A **helper script** (`run_machine.py`) to launch multiple local machines.
 - An **analysis script** (`analyze_logs.py`) that merges logs, computes clock drift, queue lengths, etc., and generates plots.
 - A **Pytest test suite** covering both unit and integration tests.
@@ -27,6 +27,12 @@ This repository implements a **small distributed system** in Python using **Lamp
    - This spawns **three** local processes, each listening on a unique port (`5001, 5002, 5003` by default).
    - By default, each machine runs for **60 seconds**, and logs are saved in a time-stamped subdirectory under `logs/`, e.g. `logs/run_2025-03-05_15-30-01/`.
    - After ~70 seconds, any remaining processes are terminated.
+
+**Tip**: You can specify a custom duration or logs directory, for example:
+```bash
+python run_machine.py --duration 30 --logs_dir "logs/custom_run"
+```
+This makes each machine run for 30 seconds and store logs in `logs/custom_run/`.
 
 ---
 
@@ -69,7 +75,7 @@ Each machine runs independently, logging events to its own file. After 60 second
 
 ## 3. Parsing Logs & Generating Plots
 
-After running the system (locally or across multiple machines), you’ll have JSON log files (e.g., `machine_1.log`, `machine_2.log`, etc.). To parse them and produce analysis plots:
+After running the system (locally or across multiple machines), you’ll have **JSON log files** (e.g., `machine_1.log`, `machine_2.log`, etc.). To parse them and produce analysis plots:
 
 ```bash
 python analyze_logs.py logs/run_2025-03-05_15-30-01/machine_*.log
@@ -83,8 +89,13 @@ python analyze_logs.py logs/run_2025-03-05_15-30-01/machine_*.log
      - **Max queue length** (for RECEIVE events),
      - Etc.
   3. **Generates** two files in the same directory:
-     - `analysis_subplots.png`: Subplots for Lamport clock vs. time, queue length vs. time, clock jumps vs. time.
+     - `analysis_subplots.png`: Subplots for **Lamport clock vs. time**, **queue length vs. time**, **clock jumps vs. time**.
      - `analysis_summary.md`: A Markdown summary with final drift, average jump, and a summary table of machine stats.
+
+**Example** of a typical line in the logs (JSON):
+```json
+{"event": "SEND", "system_time": 1677782102.9545, "machine_id": 1, "old_clock": 5, "new_clock": 6, "recipients": [["localhost", 5002]]}
+```
 
 ---
 
@@ -92,40 +103,40 @@ python analyze_logs.py logs/run_2025-03-05_15-30-01/machine_*.log
 
 ### 4.1 `machine.py` – The Machine Class
 
-Each machine acts as a **TCP server** to receive timestamps from peers and a **client** to send its local clock to other machines. Key points:
+Each machine acts as a **TCP server** to receive timestamps from peers and a **client** to send its local clock to other machines. Below is a summary of the core logic.
 
 1. **Initialization** (`__init__`):
    - **`machine_id`**: Unique ID for the machine (1, 2, 3, etc.).
-   - **`listen_port`**: TCP port where this machine **listens**.
-   - **`peer_addresses`**: List of `(host, port)` tuples for other machines.
-   - **`clock_rate`**: Random integer in `[1..6]` chosen at startup, meaning the machine processes `clock_rate` “ticks” per second.
+   - **`listen_port`**: TCP port where this machine **listens** for incoming connections.
+   - **`peer_addresses`**: A list of `(host, port)` tuples for other machines in the system.
+   - **`clock_rate`**: A random integer in `[1..6]` chosen at startup, meaning the machine processes `clock_rate` “ticks” per real second.
    - **`local_clock`**: The machine’s Lamport clock, initially 0.
-   - **`incoming_queue`**: A `queue.Queue()` for timestamps received from peers.
-   - **`server_socket`**: The **listening** socket (TCP). Bound to `(0.0.0.0, listen_port)` and set to listen with a 1s timeout.
+   - **`incoming_queue`**: A `queue.Queue()` for timestamps received from peers (via `handle_incoming_connection`).
+   - **`server_socket`**: The **listening** socket (TCP), bound to `(0.0.0.0, listen_port)` and set to `listen()`.
    - **`log_file`**: A line-buffered file where every event is logged as JSON.
 
 2. **Server Socket & Receiving**:
-   - **`listen_for_connections()`**: In a loop, calls `accept()` on the server socket. For each incoming connection, spawns a thread to handle it (`handle_incoming_connection`).
-   - **`handle_incoming_connection(conn)`**: Reads data in chunks, splits by `\n`, parses each line as an integer timestamp, and puts it in `incoming_queue`.
+   - **`listen_for_connections()`**:  
+     - In a loop, calls `accept()` on the server socket. For each incoming connection, spawns a new thread to handle it.
+   - **`handle_incoming_connection(conn)`**:  
+     - Reads data in chunks (`conn.recv(1024)`), splits by `\n`, parses each line as an integer timestamp, and puts it in `incoming_queue`.
 
 3. **Main Loop** (`main_loop()`):
-   - Runs for `run_seconds` total.
-   - Sleeps `1.0 / clock_rate` each iteration (simulating “ticks”).
+   - Runs for `run_seconds` total, sleeping `1.0 / clock_rate` between ticks (simulating “ticks”).
    - Each tick:
-     - If `incoming_queue` is **not** empty, **process** a message (`handle_receive()`).
-     - Otherwise, calls `handle_no_message()` to pick a random action (SEND to 1 peer, SEND to 2 peers, or INTERNAL event).
+     1. If `incoming_queue` is **not** empty, **process** a message (`handle_receive()`).
+     2. Otherwise, calls `handle_no_message()`, which picks a random action (SEND to 1 peer, SEND to 2 peers, or INTERNAL event).
 
 4. **Actions**:
    - **`handle_receive()`**:
-     - Dequeues a timestamp, updates `local_clock = max(local_clock, received) + 1`.
-     - Logs a `RECEIVE` event (with queue length, old/new clock).
+     - Dequeues one timestamp, updates `local_clock = max(local_clock, received) + 1`.
+     - Logs a `RECEIVE` event (queue length, old/new clock, etc.).
    - **`send_message()`**:
      - Increments `local_clock` by 1.
-     - For each recipient `(host, port)`, creates a **new** TCP socket, connects, sends `local_clock\n`.
+     - For each `(host, port)` in recipients, creates a **new** TCP socket, connects, sends `local_clock\n`.
      - Logs a `SEND`.
    - **`internal_event()`**:
-     - Increments `local_clock` by 1.
-     - Logs an `INTERNAL`.
+     - Increments `local_clock` by 1, logs an `INTERNAL`.
 
 5. **Shutdown** (`shutdown()`):
    - Logs an `END` event with `final_clock`.
@@ -133,11 +144,11 @@ Each machine acts as a **TCP server** to receive timestamps from peers and a **c
 
 ### 4.2 `run_machine.py` – Spawning Multiple Machines Locally
 
-- **Orchestrates** multiple local machines via Python’s `multiprocessing`.  
-- **Generates** a timestamp-based folder in `logs/` (e.g., `logs/run_2025-03-05_15-30-01/`) unless `--logs_dir` is specified.  
+- **Orchestrates** multiple local machines via Python’s `multiprocessing`.
+- **Generates** a timestamp-based subdirectory in `logs/` (e.g., `logs/run_2025-03-05_15-30-01/`) unless `--logs_dir` is specified.
 - For each machine (IDs 1..3):
-  - Chooses a **port** (`5001`, `5002`, `5003`),
-  - Builds a **log file** path, e.g. `logs/run_2025-03-05_15-30-01/machine_1.log`,
+  - Chooses a **port** (`5001`, `5002`, `5003` by default),
+  - Builds a **log file** path, e.g. `logs/run_YYYY-MM-DD_HH-MM-SS/machine_1.log`,
   - Spawns a `Process` that calls `machine.py` with the relevant arguments.
 - Waits ~70 seconds to allow them to finish (default `--duration=60`), then terminates any leftover processes.
 
@@ -149,23 +160,23 @@ Each machine acts as a **TCP server** to receive timestamps from peers and a **c
   ```
 - **Builds** a combined Pandas DataFrame:
   - Sorts by `system_time`.
-  - Converts columns like `old_clock`, `new_clock`, `queue_len`, etc. to numeric.
+  - Converts columns like `old_clock`, `new_clock`, `queue_len`, etc. to numeric (if present).
 - **Computes**:
   - **Final clock** from `END` events,
   - **Drift** = `max(final_clock) - min(final_clock)`,
   - **Average jump** = mean of `(new_clock - old_clock)` for `SEND/RECEIVE/INTERNAL`,
-  - **Max queue length** per machine.
-- **Generates** subplots:
+  - **Max queue length** per machine (for `RECEIVE`).
+- **Generates** subplots in `analysis_subplots.png`:
   1. **Lamport clock vs. time**,
   2. **Queue length** vs. time (only for `RECEIVE`),
   3. **Clock jump** vs. time.
-- **Writes** `analysis_subplots.png` and `analysis_summary.md` to the **same** directory as the logs.
+- **Writes** `analysis_summary.md` summarizing the final drift, average jumps, queue lengths, etc.
 
 ---
 
 ## 5. Testing Strategy
 
-We use **Pytest** to validate correctness. Run:
+We use **Pytest** to validate correctness:
 
 ```bash
 python -m pytest
@@ -183,8 +194,8 @@ python -m pytest
 ### 5.2 `test_integration.py` (Integration)
 
 - **Spawns** multiple machines locally via `run_machine.py`, passing `--logs_dir` and a short `--duration`.  
-- Waits, kills the process, then checks that logs contain `STARTUP`.  
-- Confirms the multi-machine orchestration code works.
+- Waits ~10s, then terminates the process.  
+- Checks that at least one log file has a `STARTUP` event, confirming the multi-machine orchestration works.
 
 ### 5.3 `test_analyze_logs.py` (Analysis)
 
@@ -194,13 +205,19 @@ python -m pytest
 
 ---
 
-## 6. Conclusion
+## 6. Interpreting the Subplots
 
-- **`machine.py`**: Defines a single node’s Lamport clock logic, random event generation, socket communication, and JSON logging.  
-- **`run_machine.py`**: Spawns multiple local machines in separate processes for easy testing.  
-- **`analyze_logs.py`**: Parses the resulting logs, computes drift, and plots the data.  
-- **Tests** ensure that each component (machine logic, multi-machine integration, log analysis) is correct and robust.
+When you run the analysis script, it produces `analysis_subplots.png` with three subplots:
 
-This architecture **cleanly demonstrates** Lamport clock synchronization with real network communication and comprehensive logging/analysis. You can expand it with additional machines, custom event distributions, or more sophisticated analysis as needed.
+1. **Lamport Clock vs. Time**  
+   - Plots each machine’s `new_clock` over real `system_time`.  
+   - Typically, you’ll see near-linear growth, with occasional “jumps” when a machine receives a higher timestamp from a peer.
 
+2. **Queue Length vs. Time (RECEIVE)**  
+   - Shows how many messages were waiting in the queue at each `RECEIVE`.  
+   - If a slower machine is bombarded with messages, you might see larger queue lengths.
+
+3. **Clock Jump vs. Time**  
+   - Plots `(new_clock - old_clock)` whenever `SEND`, `RECEIVE`, or `INTERNAL` occurs.  
+   - A jump of **1** means the machine incremented normally; a larger jump indicates it received a bigger timestamp from a peer and had to “catch up.”
 ---
