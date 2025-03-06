@@ -1,15 +1,15 @@
 # 262-Logical-Clocks
 
-This repository implements a **small distributed system** in Python using **Lamport logical clocks**. It features:
+This repository implements a **small distributed system** in Python using **Lamport logical clocks** following the design specifications. It features:
 
 - Multiple “virtual machines,” each with:
   - **Random clock rates** (1–6 ticks per real second),
   - **Lamport clock** logic for send/receive/internal events,
-  - **TCP socket** communication (each node is both a server and a client),
+  - **TCP socket** communication where each node acts as both a server and a client,
   - **JSON-based logging** of all events in a line-buffered file.
 - A **helper script** (`run_machine.py`) to launch multiple local machines.
-- An **analysis script** (`analyze_logs.py`) that merges logs, computes clock drift, queue lengths, etc., and generates plots.
-- A **Pytest test suite** covering both unit and integration tests.
+- An **analysis script** (`analyze_logs.py`) that merges logs, computes statistics like clock drift and queue lengths, and generates plots.
+- A **Pytest test suite** that covers both unit and integration tests because we engage in proper coding practices.
 
 ---
 
@@ -25,10 +25,10 @@ This repository implements a **small distributed system** in Python using **Lamp
    python run_machine.py
    ```
    - This spawns **three** local processes, each listening on a unique port (`5001, 5002, 5003` by default).
-   - By default, each machine runs for **60 seconds**, and logs are saved in a time-stamped subdirectory under `logs/`, e.g. `logs/run_2025-03-05_15-30-01/`.
+   - By default, each machine runs for **60 seconds**, and logs are saved in a time-stamped subdirectory under `logs/`; an example format is `logs/run_2025-03-05_15-30-01/`.
    - After ~70 seconds, any remaining processes are terminated.
 
-**Tip**: You can specify a custom duration or logs directory, for example:
+**Tip**: When running the code, you can specify a custom duration or logs directory, for example:
 ```bash
 python run_machine.py --duration 30 --logs_dir "logs/custom_run"
 ```
@@ -38,7 +38,7 @@ This makes each machine run for 30 seconds and store logs in `logs/custom_run/`.
 
 ## 2. Running on Multiple Physical Machines
 
-To truly distribute the system across separate hosts:
+To properly distribute the system across separate hosts:
 
 1. **Pick** a unique port for each machine.  
 2. **Machine 1** (Host A, IP `192.168.1.10`):
@@ -69,7 +69,7 @@ To truly distribute the system across separate hosts:
        --duration 60
    ```
 
-Each machine runs independently, logging events to its own file. After 60 seconds, each stops. Collect the logs from each host and run the **analysis** script locally to visualize results (see below).
+Each machine runs independently, logging events to its own file. After 60 seconds, each stops. Collect the logs from each host and run the **analysis** script locally to visualize results (see below for more details).
 
 ---
 
@@ -109,8 +109,8 @@ Each machine acts as a **TCP server** to receive timestamps from peers and a **c
    - **`machine_id`**: Unique ID for the machine (1, 2, 3, etc.).
    - **`listen_port`**: TCP port where this machine **listens** for incoming connections.
    - **`peer_addresses`**: A list of `(host, port)` tuples for other machines in the system.
-   - **`clock_rate`**: A random integer in `[1..6]` chosen at startup, meaning the machine processes `clock_rate` “ticks” per real second.
-   - **`local_clock`**: The machine’s Lamport clock, initially 0.
+   - **`clock_rate`**: A random integer in `[1, ..., 6]` that is chosen at startup, meaning the machine processes `clock_rate` “ticks” per real second.
+   - **`local_clock`**: The machine’s Lamport clock, which is initially 0.
    - **`incoming_queue`**: A `queue.Queue()` for timestamps received from peers (via `handle_incoming_connection`).
    - **`server_socket`**: The **listening** socket (TCP), bound to `(0.0.0.0, listen_port)` and set to `listen()`.
    - **`log_file`**: A line-buffered file where every event is logged as JSON.
@@ -148,7 +148,7 @@ Each machine acts as a **TCP server** to receive timestamps from peers and a **c
 - **Generates** a timestamp-based subdirectory in `logs/` (e.g., `logs/run_2025-03-05_15-30-01/`) unless `--logs_dir` is specified.
 - For each machine (IDs 1..3):
   - Chooses a **port** (`5001`, `5002`, `5003` by default),
-  - Builds a **log file** path, e.g. `logs/run_YYYY-MM-DD_HH-MM-SS/machine_1.log`,
+  - Builds a **log file** path, with example format `logs/run_YYYY-MM-DD_HH-MM-SS/machine_1.log`,
   - Spawns a `Process` that calls `machine.py` with the relevant arguments.
 - Waits ~70 seconds to allow them to finish (default `--duration=60`), then terminates any leftover processes.
 
@@ -194,8 +194,8 @@ python -m pytest
 ### 5.2 `test_integration.py` (Integration)
 
 - **Spawns** multiple machines locally via `run_machine.py`, passing `--logs_dir` and a short `--duration`.  
-- Waits ~10s, then terminates the process.  
-- Checks that at least one log file has a `STARTUP` event, confirming the multi-machine orchestration works.
+- Waits ~10s, then terminates the process. We do not run for very long because we are merely performing a test.
+- Checks that at least one log file has a `STARTUP` event, confirming that we are able to start up a proacess with multiple machines.
 
 ### 5.3 `test_analyze_logs.py` (Analysis)
 
@@ -207,17 +207,17 @@ python -m pytest
 
 ## 6. Interpreting the Subplots
 
-When you run the analysis script, it produces `analysis_subplots.png` with three subplots:
+When you run the analysis script, it should produce `analysis_subplots.png` with three subplots:
 
 1. **Lamport Clock vs. Time**  
    - Plots each machine’s `new_clock` over real `system_time`.  
-   - Typically, you’ll see near-linear growth, with occasional “jumps” when a machine receives a higher timestamp from a peer.
+   - Typically there will be near-linear growth with occasional jumps when a machine receives a higher timestamp from a peer.
 
 2. **Queue Length vs. Time (RECEIVE)**  
    - Shows how many messages were waiting in the queue at each `RECEIVE`.  
-   - If a slower machine is bombarded with messages, you might see larger queue lengths.
+   - If a slower machine is bombarded with messages, there might be larger queue lengths because the machine needs to process all of the messages.
 
 3. **Clock Jump vs. Time**  
    - Plots `(new_clock - old_clock)` whenever `SEND`, `RECEIVE`, or `INTERNAL` occurs.  
-   - A jump of **1** means the machine incremented normally; a larger jump indicates it received a bigger timestamp from a peer and had to “catch up.”
+   - A jump of **1** means the machine incremented normally, and a larger jump indicates it received a bigger timestamp from a peer and had to catch up.
 ---
