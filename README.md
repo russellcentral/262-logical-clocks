@@ -11,6 +11,8 @@ This repository implements a **small distributed system** in Python using **Lamp
 - An **analysis script** (`analyze_logs.py`) that merges logs, computes statistics like clock drift and queue lengths, and generates plots.
 - A **Pytest test suite** that covers both unit and integration tests because we engage in proper coding practices.
 
+For more information, please refer to our engineering notebook.
+
 ---
 
 ## 1. Running the System Locally
