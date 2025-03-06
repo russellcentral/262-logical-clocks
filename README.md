@@ -15,6 +15,8 @@ This repository implements a **small distributed system** in Python using **Lamp
 
 ---
 
+---
+
 ## 1. Running the System Locally
 
 1. **Clone** or copy this repository to your local machine.  
